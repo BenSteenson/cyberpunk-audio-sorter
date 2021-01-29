@@ -1,0 +1,16 @@
+{
+  "name": "cyberpunk-audio-sorter",
+  "version": "1.0.0",
+  "description": "Really dumb audio sorter for Cyberpunk 2077.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Ben Steenson",
+  "license": "WTFPL",
+  "dependencies": {
+    "csv-parse": "^4.15.0",
+    "fs": "0.0.1-security"
+  }
+}
