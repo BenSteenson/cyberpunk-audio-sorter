@@ -48,13 +48,14 @@ for (let file of filenames) {
   const fullPathFrom = audioPath + '/' + file
   record = records.find(record => { return file === record[trackName] })
   if (!record) {
-    if (!deleteUnknown) continue
-    console.log('Deleting', fullPathFrom)
-    fs.unlinkSync(fullPathFrom)
+    if (deleteUnknown) {
+      console.log('Deleting', fullPathFrom)
+      fs.unlinkSync(fullPathFrom)
+    }
     continue
   }
   const fullPathTo = audioPath + '/' + record[titleName]
-  console.log('Moving', fullPathFrom, fullPathTo)
+  console.log('Renaming', fullPathFrom, 'to', fullPathTo)
   if (!fs.existsSync(fullPathTo.substring(0, fullPathTo.lastIndexOf('/')))) fs.mkdirSync(fullPathTo.substring(0, fullPathTo.lastIndexOf('/')), { recursive: true })
   fs.renameSync(fullPathFrom, fullPathTo)
 }
