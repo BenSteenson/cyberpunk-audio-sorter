@@ -17,7 +17,7 @@ let csv = fs.readFileSync(csvPath, {encoding:'utf8', flag:'r'})
 //The spreadsheet currently has a header line; "Might not be accurate. Please correct if more information is found"
 //Delete that and treat the rest as CSV
 let lines = csv.split('\n')
-lines.splice(0,1)
+lines.splice(0, 1)
 csv = lines.join('\n')
 
 //Extract Filenames
@@ -29,24 +29,32 @@ const records = parse(csv, {
   rtrim: true,
   trim: true
 })
-for (let i = 0; i < records.length; i++) {
-  records[i][titleName] = records[i][titleName].replace(/[^() a-zA-Z0-9-_]/g, '').trim().substring(0, maxLength) + outputExtension
-  records[i].filename = records[i][trackName] + outputExtension
+for (let record of records) {
+  //Remove characters not safe for Windows paths, trim whitespace, truncate to maximum length and add extension
+  let filename = record[titleName].replace(/[^() a-zA-Z0-9-_]/g, '').trim().substring(0, maxLength) + outputExtension
+  let dupeCheck = records.find(prev => { return prev[titleName] === filename })
+  if (dupeCheck) {
+    //TODO: Improve duplicate name handling.
+    console.log(`Found duplicate file name: ${dupeCheck[titleName]}. Appending \'0\'.`)
+    record[titleName] = filename.replace('.ogg', '0.ogg')
+  }
+  else record[titleName] = filename
+  record[trackName] = record[trackName] + outputExtension
 }
 
 //Load and Parse Audio
 filenames = fs.readdirSync(audioPath)
-filenames.forEach(file => {
+for (let file of filenames) {
   const fullPathFrom = audioPath + '/' + file
-  record = records.find(record => { return file === record.filename})
+  record = records.find(record => { return file === record[trackName] })
   if (!record) {
-    if (!deleteUnknown) return true
-    console.log('Deleting',fullPathFrom)
+    if (!deleteUnknown) continue
+    console.log('Deleting', fullPathFrom)
     fs.unlinkSync(fullPathFrom)
-    return true
+    continue
   }
   const fullPathTo = audioPath + '/' + record[titleName]
-  console.log('Moving',fullPathFrom,fullPathTo)
+  console.log('Moving', fullPathFrom, fullPathTo)
   if (!fs.existsSync(fullPathTo.substring(0, fullPathTo.lastIndexOf('/')))) fs.mkdirSync(fullPathTo.substring(0, fullPathTo.lastIndexOf('/')), { recursive: true })
   fs.renameSync(fullPathFrom, fullPathTo)
-})
+}
