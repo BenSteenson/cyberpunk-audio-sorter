@@ -10,7 +10,7 @@
   "author": "Ben Steenson",
   "license": "WTFPL",
   "dependencies": {
-    "csv-parse": "^4.15.0",
+    "csv-parse": "^4.15.1",
     "fs": "0.0.1-security"
   }
 }

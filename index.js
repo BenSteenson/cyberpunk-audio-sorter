@@ -1,11 +1,11 @@
 //Constants
-const csvPath = "./data.csv"    //CSV from Google Sheets
-const audioPath = "./audio"     //Path where audio files are located
-const deleteUnknown = false     //Delete the files that don't have names in the CSV?
-const trackName = 'Track'       //Name of the column containing the Offset IDs/filenames
-const titleName = 'Title'       //Name of the column containing the Song Titles
-const outputExtension = '.ogg'  //Extension of the audio files being sorted
-const maxLength = 55            //Maximum number of characters allowed in a song title
+const csvPath = "./data.csv"          //CSV from Google Sheets
+const audioPath = "./audio"           //Path where audio files are located
+const deleteUnknown = false           //Delete the files that don't have names in the CSV?
+const trackName = '.ogg File Name'    //Name of the column containing the Offset IDs/filenames
+const titleName = 'Title'             //Name of the column containing the Song Titles
+const outputExtension = '.ogg'        //Extension of the audio files being sorted
+const maxLength = 55                  //Maximum number of characters allowed in a song title
 
 //Dependencies
 const parse = require('csv-parse/lib/sync')
@@ -14,10 +14,9 @@ var fs = require('fs')
 //Load CSV File
 let csv = fs.readFileSync(csvPath, {encoding:'utf8', flag:'r'})
 
-//The spreadsheet currently has a header line; "Might not be accurate. Please correct if more information is found"
-//Delete that and treat the rest as CSV
+//Deletes everything up to the header line
 let lines = csv.split('\n')
-lines.splice(0, 1)
+lines.splice(0, 22)
 csv = lines.join('\n')
 
 //Extract Filenames
@@ -29,18 +28,30 @@ const records = parse(csv, {
   rtrim: true,
   trim: true
 })
+let foundDupe = false
 for (let record of records) {
+  if (!record[titleName] && !record[trackName]) continue
+  if (!record[titleName]) {
+    console.log(`Track ${record[trackName]} does not have a number.`)
+    continue
+  }
+  if (!record[trackName]) {
+    console.log(`Track ${record[titleName]} does not have a title.`)
+    continue
+  }
   //Remove characters not safe for Windows paths, trim whitespace, truncate to maximum length and add extension
   let filename = record[titleName].replace(/[^() a-zA-Z0-9-_]/g, '').trim().substring(0, maxLength) + outputExtension
   let dupeCheck = records.find(prev => { return prev[titleName] === filename })
   if (dupeCheck) {
     //TODO: Improve duplicate name handling.
+    foundDupe = true
     console.log(`Found duplicate file name: ${dupeCheck[titleName]}. Appending \'0\'.`)
     record[titleName] = filename.replace('.ogg', '0.ogg')
   }
   else record[titleName] = filename
   record[trackName] = record[trackName] + outputExtension
 }
+if (foundDupe) console.log('\n')
 
 //Load and Parse Audio
 filenames = fs.readdirSync(audioPath)
