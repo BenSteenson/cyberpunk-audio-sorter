@@ -5,7 +5,7 @@ const deleteUnknown = false           //Delete the files that don't have names i
 const trackName = '.wem File Name'    //Name of the column containing the Offset IDs/filenames
 const titleName = 'Title'             //Name of the column containing the Song Titles
 const outputExtension = '.ogg'        //Extension of the audio files being sorted
-const maxLength = 128                  //Maximum number of characters allowed in a song title
+const maxLength = 128                 //Maximum number of characters allowed in a song title
 
 //Dependencies
 const parse = require('csv-parse/lib/sync')
@@ -32,11 +32,11 @@ let foundDupe = false
 for (let record of records) {
   if (!record[titleName] && !record[trackName]) continue
   if (!record[titleName]) {
-    console.log(`Track ${record[trackName]} does not have a number.`)
+    console.log(`Track ${record[trackName]} does not have a title.`)
     continue
   }
   if (!record[trackName]) {
-    console.log(`Track ${record[titleName]} does not have a title.`)
+    console.log(`Track ${record[titleName]} does not have a WEM offset.`)
     continue
   }
   //Remove characters not safe for Windows paths, trim whitespace, truncate to maximum length and add extension
