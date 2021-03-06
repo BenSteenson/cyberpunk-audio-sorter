@@ -2,10 +2,10 @@
 const csvPath = "./data.csv"          //CSV from Google Sheets
 const audioPath = "./audio"           //Path where audio files are located
 const deleteUnknown = false           //Delete the files that don't have names in the CSV?
-const trackName = '.ogg File Name'    //Name of the column containing the Offset IDs/filenames
+const trackName = '.wem File Name'    //Name of the column containing the Offset IDs/filenames
 const titleName = 'Title'             //Name of the column containing the Song Titles
 const outputExtension = '.ogg'        //Extension of the audio files being sorted
-const maxLength = 55                  //Maximum number of characters allowed in a song title
+const maxLength = 128                  //Maximum number of characters allowed in a song title
 
 //Dependencies
 const parse = require('csv-parse/lib/sync')
@@ -45,8 +45,8 @@ for (let record of records) {
   if (dupeCheck) {
     //TODO: Improve duplicate name handling.
     foundDupe = true
-    console.log(`Found duplicate file name: ${dupeCheck[titleName]}. Appending \'0\'.`)
-    record[titleName] = filename.replace('.ogg', '0.ogg')
+    console.log(`Found duplicate file name: ${dupeCheck[titleName]}. Appending \'_0\'.`)
+    record[titleName] = filename.replace('.ogg', '_0.ogg')
   }
   else record[titleName] = filename
   record[trackName] = record[trackName] + outputExtension
